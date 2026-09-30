@@ -295,7 +295,8 @@
     });
     IDS.forEach(function (id) {
       var st = stats[id], s = state.sides[id];
-      if (st.inb) log.push({ t: s.short + ': ' + st.inb + ' INBOUND, ' + st.int + ' INTERCEPTED, ' + st.hit + ' IMPACTS. LOSSES +' + st.cas.toFixed(1) + 'M' + (st.lost ? ', ' + st.lost + ' UNITS LOST ON GROUND' : '') + '.', c: 'side' + id });
+      // post: true = outcome line; UIs should reveal it only after the impacts are shown.
+      if (st.inb) log.push({ t: s.short + ': ' + st.inb + ' INBOUND, ' + st.int + ' INTERCEPTED, ' + st.hit + ' IMPACTS. LOSSES +' + st.cas.toFixed(1) + 'M' + (st.lost ? ', ' + st.lost + ' UNITS LOST ON GROUND' : '') + '.', c: 'side' + id, post: true });
     });
 
     IDS.forEach(function (id) {
@@ -338,9 +339,15 @@
   function simulate(pA, pB, seed, opts) {
     opts = opts || {};
     var st = newGame({ pA: pA, pB: pB, seed: seed, maxTurns: opts.maxTurns });
-    var guard = 0;
-    while (!st.over && guard++ < 100) resolveTurn(st, { A: decide(st, 'A'), B: decide(st, 'B') });
+    var guard = 0, trace = opts.trace ? [] : null;
+    while (!st.over && guard++ < 100) {
+      var tr = resolveTurn(st, { A: decide(st, 'A'), B: decide(st, 'B') });
+      // Optional presentation trace (read-only copy of what happened; does not affect the outcome).
+      if (trace) trace.push({ defcon: st.defcon, acts: { A: tr.acts.A.type, B: tr.acts.B.type },
+        falseAlarm: { A: !!tr.acts.A.falseAlarm, B: !!tr.acts.B.falseAlarm }, events: tr.events });
+    }
     var r = st.result; r.pA = pA; r.pB = pB; r.seed = seed;
+    if (trace) r.trace = trace;
     return r;
   }
 

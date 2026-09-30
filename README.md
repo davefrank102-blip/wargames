@@ -32,8 +32,18 @@ build step to play, no network requests.
    - **0 — ZERO PLAYERS (WOPR vs WOPR).** Pick a doctrine for each side and
      watch a single animated scenario, or choose **LEARN MODE**.
 3. **LEARN MODE (batch simulation).** WOPR runs 100 / 500 / 1000 / 5000 scenarios
-   across every doctrine matchup and prints a results table (US wins, USSR wins,
-   mutual destruction, stalemate, no war) plus its conclusions.
+   across every doctrine matchup on the big board, like the end of the film: every
+   scenario's launches are drawn as glowing arcs with impact flashes, a flickering
+   scenario name (`U.S. FIRST STRIKE`, `USSR FIRST STRIKE`, `NATO / WARSAW PACT`…,
+   derived from the doctrine matchup and opening move) and a flashing
+   `WINNER: NONE` / `WINNER: US` for each game, a big game counter, a flickering DEFCON,
+   a live tally, a per-matchup table and the last 10 games. The first few games play
+   at near-normal speed, then the rate doubles every few seconds until hundreds of games
+   fly by per second (at that point a sample of each game's arcs is drawn). Then the
+   board flashes and goes quiet, and the terminal types *A STRANGE GAME…* followed by
+   the full results table and verdict. SPEED and PAUSE apply; **SKIP TO RESULTS** jumps
+   straight to the table. The animation is presentation only: the results are the same
+   as `WOPRCore.runBatch` with the same seed (checked by the tests).
 4. **TIC-TAC-TOE.** The movie-ending homage: WOPR plays both sides, game after
    game. Every game is a draw — and it can then apply that lesson to Global
    Thermonuclear War.
@@ -66,7 +76,13 @@ Append a hash to the URL to skip the menus:
 
 Example: https://davefrank102-blip.github.io/wargames/#auto=batch&n=1000
 
+![LEARN mode animation](screenshot_learn_anim.png)
+
 ![LEARN mode batch results](screenshot_batch.png)
+
+A short capture of the LEARN animation: [`learn_demo.mp4`](learn_demo.mp4).
+
+More screenshots: [menu](screenshot_menu.png) · [scenario result](screenshot_result.png) · [mobile layout](screenshot_mobile.png)
 
 ## Build & test
 
@@ -77,15 +93,11 @@ The game logic lives in `core.js` (pure, DOM-free) and the UI in
 npm install          # jsdom + puppeteer-core (only needed for the tests)
 node build.js        # index.src.html + core.js  ->  index.html
 node test_core.js    # Node-only tests of the game logic (determinism, 2000-game batch, tic-tac-toe)
-node test.js         # headless-browser end-to-end test; writes screenshot*.png
+node test.js         # headless-browser end-to-end test (match, LEARN animation, SKIP, pause, mobile 390x844); writes screenshot*.png
 ```
 
 `test.js` uses `puppeteer-core` with Chrome at `/usr/bin/google-chrome`; edit
 `executablePath` if your browser lives elsewhere.
-
-On every push to `main`, the GitHub Actions workflow in
-`.github/workflows/build.yml` runs the build and both test suites, then commits
-the rebuilt `index.html` and fresh screenshots.
 
 ## Disclaimer
 
